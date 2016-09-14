@@ -9,8 +9,10 @@ angular.module('picardy.fontawesome', [])
       link: function (scope, element, attrs) {
         var _observeAttrWrapper = util._observeAttrWrapper(attrs, element)
         util._keys(attrs).forEach(function(e,i){
-          _observeAttrWrapper._observeAttr(e)
+          _observeAttrWrapper._observeAttr(e);
         })
+      
+
         /*** CONDITIONAL ATTRS ***/
         // automatically populate fa-li if DOM structure indicates
         element.toggleClass('fa-li',
@@ -32,8 +34,46 @@ angular.module('picardy.fontawesome', [])
       template: '<span ng-transclude class="fa-stack fa-lg"></span>',
       replace: true,
       link: function (scope, element, attrs) {
-        var _observeAttrWrapper = util._observeAttrWrapper(attrs, element)
-         _observeAttrWrapper._observeAttr('size','fa');
+
+        /*** STRING ATTRS ***/
+        // keep a state of the current attrs so that when they change,
+        // we can remove the old attrs before adding the new ones.
+        var currentClasses = {};
+
+        // generic function to bind string attrs
+        function _observeStringAttr (attr, baseClass) {
+          var className;
+
+          attrs.$observe(attr, function () {
+            baseClass = baseClass || 'fa-' + attr;
+            element.removeClass(currentClasses[attr]);
+            if (attrs[attr]) {
+              className = [baseClass, attrs[attr]].join('-');
+              element.addClass(className);
+              currentClasses[attr] = className;
+            }
+          });
+        }
+
+        _observeStringAttr('size');
+
+        /**
+         * size can be passed "large" or an integer
+         */
+        attrs.$observe('size', function () {
+          var className;
+
+          element.removeClass(currentClasses.size);
+
+          if (attrs.size === 'large') {
+            className = 'fa-lg';
+          } else if (!isNaN(parseInt(attrs.size, 10))) {
+            className = 'fa-' + attrs.size + 'x';
+          }
+
+          element.addClass(className);
+          currentClasses.size = className;
+        });
       }
     };
   }])
@@ -48,14 +88,19 @@ angular.module('picardy.fontawesome', [])
       // attributes like name、rotate、flip
       function _observeStringAttr (attr, baseClass) {
         // check attrs[attr] string or empty
+        //console.log(attrs);
+        //console.log(attr);
+        //console.log(attrs[attr]);
         if(!angular.isString(attrs[attr] || !!attrs[attr]))
           return;
         var className;
-        baseClass = baseClass || 'fa-' + attr;                    // make baseClass
-        //element.removeClass(currentClasses[attr]);                // remove old className from dom element
-        className = [baseClass, attrs[attr]].join('-');           // connnect baseClass and attrs[attr] with '-'
-        element.addClass(className);                              // add className to dom element
-        //currentClasses[attr] = className;                         // override className within currentClass Object
+        attrs.$observe(attr, function () {
+          baseClass = baseClass || 'fa-' + attr;                    // make baseClass
+          element.removeClass(currentClasses[attr]);                // remove old className from dom element
+          className = [baseClass, attrs[attr]].join('-');           // connnect baseClass and attrs[attr] with '-'
+          element.addClass(className);                              // add className to dom element
+          currentClasses[attr] = className;                         // override className within currentClass Object
+        });
       }
 
       // generic function to bind string attrs
@@ -66,7 +111,7 @@ angular.module('picardy.fontawesome', [])
           return;
         var className;
         baseClass = baseClass || 'fa-' + attr;                       // make baseClass
-        //element.removeClass(currentClasses[attr]);                   // remove old className from dom element
+        element.removeClass(currentClasses[attr]);                   // remove old className from dom element
 
         if (attrs[attr] === 'large') {                               // connnect baseClass and attrs[attr] with '-'
           className = [baseClass,'lg'].join('-');
@@ -74,17 +119,20 @@ angular.module('picardy.fontawesome', [])
           className = [baseClass,attrs[attr]+'x'].join('-');
         }
         element.addClass(className);                                  // add className to dom element
-        //currentClasses[attr] = className;                             // override className within currentClass Object
+        currentClasses[attr] = className;                             // override className within currentClass Object
 
       }
 
 
       // generic function to bind boolean attrs
-      function _observeBooleanAttr (attr, baseClass) {
+      function _observeBooleanAttr (attr, className) {
         var value;
-        baseClass = baseClass || 'fa-' + attr;
-        value = attr in attrs && attrs[attr] !== 'false' && attrs[attr] !== false;
-        element.toggleClass(baseClass, value);
+
+        attrs.$observe(attr, function () {
+          className = className || 'fa-' + attr;
+          value = attr in attrs && attrs[attr] !== 'false' && attrs[attr] !== false;
+          element.toggleClass(className, value);
+        });
       }
 
 
@@ -110,7 +158,6 @@ angular.module('picardy.fontawesome', [])
           }
         });
       }
-
 
       function _observeAttr(attr){
         switch(attr){
@@ -139,7 +186,11 @@ angular.module('picardy.fontawesome', [])
           }
       }
       return {
-          _observeAttr: _observeAttr
+          _observeStringAttr  : _observeStringAttr,
+          _observeNumberAttr  : _observeNumberAttr,
+          _observeBooleanAttr : _observeBooleanAttr,
+          _observeAltAttr     : _observeAltAttr,
+          _observeAttr        : _observeAttr
       }
     }
 
