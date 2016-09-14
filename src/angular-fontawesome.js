@@ -31,7 +31,7 @@ angular.module('picardy.fontawesome', [])
         _observeStringAttr('name', 'fa');
         _observeStringAttr('rotate');
         _observeStringAttr('flip');
-        _observeStringAttr('stack');
+        //_observeStringAttr('stack');
 
         /**
          * size can be passed "large" or an integer
