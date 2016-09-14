@@ -9,19 +9,8 @@ angular.module('picardy.fontawesome', [])
       link: function (scope, element, attrs) {
         var _observeAttrWrapper = util._observeAttrWrapper(attrs, element);
         util._keys(attrs).forEach(function (e) {
-          //console.log(e);
           _observeAttrWrapper._observeAttr(e);
         });
-        //_observeAttrWrapper._observeAttr('name');
-        //_observeAttrWrapper._observeAttr('rotate');
-        //_observeAttrWrapper._observeAttr('flip');
-        //_observeAttrWrapper._observeAttr('size');
-        //_observeAttrWrapper._observeAttr('stack');
-        //_observeAttrWrapper._observeAttr('border');
-        //_observeAttrWrapper._observeAttr('fw');
-        //_observeAttrWrapper._observeAttr('inverse');
-        //_observeAttrWrapper._observeAttr('spin');
-        //_observeAttrWrapper._observeAttr('alt');
         /*** CONDITIONAL ATTRS ***/
         // automatically populate fa-li if DOM structure indicates
         element.toggleClass('fa-li',
@@ -84,33 +73,18 @@ angular.module('picardy.fontawesome', [])
           return;
         }
         */
-        /*
-        console.log(attrs);
-        console.log(attr);
-        baseClass = baseClass || 'fa-' + attr;                       // make baseClass
-        element.removeClass(currentClasses[attr]);                   // remove old className from dom element
-
-        if (attrs[attr] === 'large') {                               // connnect baseClass and attrs[attr] with '-'
-          className = [baseClass,'lg'].join('-');
-        } else if (!isNaN(parseInt(attrs[attr], 10))) {
-          className = [baseClass,attrs[attr] + 'x'].join('-');
-        }
-        console.log(className);
-        element.addClass(className);                                  // add className to dom element
-        currentClasses[attr] = className;                             // override className within currentClass Object
-        */
         attrs.$observe(attr, function () {
           var className;
-          baseClass = baseClass || 'fa-' + attr;
-          element.removeClass(currentClasses[attr]);
+          baseClass = baseClass || 'fa-' + attr;                        // make baseClass
+          element.removeClass(currentClasses[attr]);                  // remove old className from dom element
           if (attrs[attr] === 'large') {
-            className = [baseClass,'lg'].join('-');
+            className = [baseClass,'lg'].join('-');                   // connnect baseClass and attrs[attr] with '-'
           } else if (!isNaN(parseInt(attrs[attr], 10))) {
             className = [baseClass,attrs[attr] + 'x'].join('-');
           }
 
-          element.addClass(className);
-          currentClasses.size = className;
+          element.addClass(className);                                // add className to dom element
+          currentClasses.size = className;                            // override className within currentClass Object
         });
 
       }
