@@ -9,9 +9,19 @@ angular.module('picardy.fontawesome', [])
       link: function (scope, element, attrs) {
         var _observeAttrWrapper = util._observeAttrWrapper(attrs, element);
         util._keys(attrs).forEach(function (e) {
+          //console.log(e);
           _observeAttrWrapper._observeAttr(e);
         });
-
+        //_observeAttrWrapper._observeAttr('name');
+        //_observeAttrWrapper._observeAttr('rotate');
+        //_observeAttrWrapper._observeAttr('flip');
+        //_observeAttrWrapper._observeAttr('size');
+        //_observeAttrWrapper._observeAttr('stack');
+        //_observeAttrWrapper._observeAttr('border');
+        //_observeAttrWrapper._observeAttr('fw');
+        //_observeAttrWrapper._observeAttr('inverse');
+        //_observeAttrWrapper._observeAttr('spin');
+        //_observeAttrWrapper._observeAttr('alt');
         /*** CONDITIONAL ATTRS ***/
         // automatically populate fa-li if DOM structure indicates
         element.toggleClass('fa-li',
@@ -50,9 +60,11 @@ angular.module('picardy.fontawesome', [])
       function _observeStringAttr (attr, baseClass) {
         // check attrs[attr] string or empty
         var className;
+        /*
         if (!angular.isString(attrs[attr] || !!attrs[attr])) {
           return;
         }
+        */
         attrs.$observe(attr, function () {
           baseClass = baseClass || 'fa-' + attr;                    // make baseClass
           element.removeClass(currentClasses[attr]);                // remove old className from dom element
@@ -66,10 +78,15 @@ angular.module('picardy.fontawesome', [])
       // attributes like size、stack
       function _observeNumberAttr (attr, baseClass) {
         // check attrs[attr] String or empty (ignore 0)
-        var className;
+        //var className;
+        /*
         if (!angular.isString(attrs[attr] || !!attrs[attr])) {
           return;
         }
+        */
+        /*
+        console.log(attrs);
+        console.log(attr);
         baseClass = baseClass || 'fa-' + attr;                       // make baseClass
         element.removeClass(currentClasses[attr]);                   // remove old className from dom element
 
@@ -78,8 +95,23 @@ angular.module('picardy.fontawesome', [])
         } else if (!isNaN(parseInt(attrs[attr], 10))) {
           className = [baseClass,attrs[attr] + 'x'].join('-');
         }
+        console.log(className);
         element.addClass(className);                                  // add className to dom element
         currentClasses[attr] = className;                             // override className within currentClass Object
+        */
+        attrs.$observe(attr, function () {
+          var className;
+          baseClass = baseClass || 'fa-' + attr;
+          element.removeClass(currentClasses[attr]);
+          if (attrs[attr] === 'large') {
+            className = [baseClass,'lg'].join('-');
+          } else if (!isNaN(parseInt(attrs[attr], 10))) {
+            className = [baseClass,attrs[attr] + 'x'].join('-');
+          }
+
+          element.addClass(className);
+          currentClasses.size = className;
+        });
 
       }
 
@@ -158,7 +190,7 @@ angular.module('picardy.fontawesome', [])
     // var keyWhiteList = ['name','rotate','flip','size','stack','border','fw','inverse','spin','alt'];
     function _keys (obj, keyWhiteList) {
       var keys = [],key;
-      keyWhiteList = keyWhiteList || ['name','rotate','flip','size','stack','border','fw','inverse','spin'];
+      keyWhiteList = keyWhiteList || ['name','rotate','flip','size','stack','border','fw','inverse','spin','alt'];
       for (key in obj) {
         if (keyWhiteList.indexOf(key) !== -1) {
           keys.push(key);
